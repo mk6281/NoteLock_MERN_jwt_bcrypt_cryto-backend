@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ObjectId } = require("mongodb");
@@ -9,6 +10,8 @@ const app = express();
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
+const PORT = process.env.PORT || 8081;
+
 app.use(helmet());
 
 app.use(rateLimit({
@@ -18,13 +21,14 @@ app.use(rateLimit({
 
 // ================== CONFIG ==================
 app.use(express.json());
-app.use(cors());
-
-const url = "mongodb://127.0.0.1:27017";
+app.use(cors({
+  origin: "*"
+}));
+const url = process.env.MONGO_URI;
 const dbName = "signup";
 
-const SECRET_KEY = "mk_secret";      // 🔐 encryption key
-const JWT_SECRET = "mk_jwt_secret";  // 🔐 JWT key
+const SECRET_KEY = process.env.SECRET_KEY;
+const JWT_SECRET = process.env.JWT_SECRET;
 
 let db;
 
@@ -34,8 +38,8 @@ MongoClient.connect(url)
     console.log("✅ Connected to MongoDB");
     db = client.db(dbName);
 
-    app.listen(8081, () => {
-      console.log("🚀 Server running on port 8081");
+    app.listen(PORT, () => {
+      console.log("🚀 Server running on port ",PORT);
     });
   })
   .catch(err => console.error("❌ DB Error:", err));
